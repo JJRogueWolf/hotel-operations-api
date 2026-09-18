@@ -1,24 +1,29 @@
 import os
-from contextlib import contextmanager
-
-import psycopg
-from psycopg.rows import dict_row
 from dotenv import load_dotenv
+from sqlalchemy import URL, create_engine
+from sqlalchemy.orm import sessionmaker
 
 load_dotenv()
 
-@contextmanager
-def get_db_connection():
-    connection = psycopg.connect(
-        host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT"),
-        dbname=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        row_factory=dict_row
-    )
-    
-    try:
-        yield connection
-    finally:
-        connection.close()
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+
+DATABASE_URL = URL.create(
+    drivername ="postgresql+psycopg",
+    username=DB_USER,
+    password=DB_PASSWORD,
+    host=DB_HOST,
+    port=int(DB_PORT),
+    database=DB_NAME,
+)
+
+engine = create_engine(DATABASE_URL)
+
+SessionLocal = sessionmaker(bind=engine)
+
+def get_db():
+    with SessionLocal() as session:
+        yield session
