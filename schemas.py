@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated, Literal
 from pydantic import BaseModel, Field, StringConstraints
 
@@ -19,6 +20,7 @@ class IssueResponse(BaseModel):
     room: int
     description: str
     status: Literal["Open", "Closed"]
+    created_at: datetime
     
 class IssueListResponse(BaseModel):
     issues: list[IssueResponse]

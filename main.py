@@ -2,15 +2,15 @@ from fastapi.responses import JSONResponse
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 
-import psycopg
 from database import get_db
-from schemas import IssueCreate, IssueResponse, IssueListResponse
 from models import Issue
+from schemas import IssueCreate, IssueResponse, IssueListResponse
 
 app = FastAPI()
 
-@app.exception_handler(psycopg.Error)
+@app.exception_handler(SQLAlchemyError)
 async def database_exception_handler(request, exc):
     return JSONResponse(
         status_code=500,
