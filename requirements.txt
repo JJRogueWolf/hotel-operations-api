@@ -4,3 +4,5 @@ psycopg[binary]
 python-dotenv
 sqlalchemy
 alembic
+pytest
+httpx

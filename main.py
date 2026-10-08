@@ -70,3 +70,7 @@ def delete_issue(issue_id: int, db: Session = Depends(get_db)):
     db.delete(issue)
     db.commit()
     return {"message": f"Issue ID #{issue_id} has been deleted!"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
