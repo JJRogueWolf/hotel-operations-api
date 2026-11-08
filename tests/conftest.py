@@ -4,6 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import URL, create_engine, text
 from sqlalchemy.orm import Session
+from auth import create_access_token, ADMIN_USERNAME
 
 from database import get_db
 from main import app
@@ -53,6 +54,10 @@ def client():
 
         try:
             with TestClient(app) as test_client:
+                token = create_access_token(ADMIN_USERNAME)
+                test_client.headers.update({
+                    "Authorization": f"Bearer {token}"
+                })
                 yield test_client
         finally:
             app.dependency_overrides.pop(get_db, None)
