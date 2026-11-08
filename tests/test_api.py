@@ -107,3 +107,14 @@ def test_invalid_issue_data(client):
     )
 
     assert response.status_code == 422
+    
+def test_rollback_isolation(client):
+    response = client.post(
+        "/issues",
+        json={
+            "room": 999,
+            "description": "Rollback verification",
+        },
+    )
+
+    assert response.status_code == 201
