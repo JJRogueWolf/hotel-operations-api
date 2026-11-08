@@ -3,6 +3,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
+import logging
 
 from database import get_db
 from models import Issue
@@ -10,8 +11,11 @@ from schemas import IssueCreate, IssueResponse, IssueListResponse
 
 app = FastAPI()
 
+logger = logging.getLogger(__name__)
+
 @app.exception_handler(SQLAlchemyError)
 async def database_exception_handler(request, exc):
+    logger.exception("Database operation failed", exc_info= exc)
     return JSONResponse(
         status_code=500,
         content={"detail": "A database error occurred"}
