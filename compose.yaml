@@ -14,12 +14,11 @@ services:
       timeout: 5s
       retries: 10
 
-  api:
+  migrate:
     build: .
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:8000:8000"
-    environment:
+    command: ["alembic", "upgrade", "head"]
+    restart: "no"
+    environment: &app_environment
       DB_HOST: db
       DB_PORT: "5432"
       DB_NAME: hotel_operations
@@ -27,12 +26,23 @@ services:
       DB_PASSWORD: ${DOCKER_DB_PASSWORD:?Set DOCKER_DB_PASSWORD in .env}
       MIGRATION_DB_USER: hotel_app
       MIGRATION_DB_PASSWORD: ${DOCKER_DB_PASSWORD:?Set DOCKER_DB_PASSWORD in .env}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  api:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      <<: *app_environment
       AUTH_USERNAME: ${AUTH_USERNAME:?Set AUTH_USERNAME in .env}
       AUTH_PASSWORD_HASH: ${AUTH_PASSWORD_HASH:?Set AUTH_PASSWORD_HASH in .env}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:?Set JWT_SECRET_KEY in .env}
     depends_on:
-      db:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
 
 volumes:
   postgres_data:
